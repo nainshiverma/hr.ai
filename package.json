@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "name": "hr-ai",
+  "version": "1.0.0",
+  "description": "Welcome to **Hr.Ai**, the revolutionary AI-powered mock interview and assessment application designed to transform the way candidates prepare for their dream jobs. Our application leverages cutting-edge artificial intelligence technology to provide realistic interview experiences and comprehensive assessments, ensuring candidates are well-prepared and confident.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
