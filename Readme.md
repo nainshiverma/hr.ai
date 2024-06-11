@@ -28,7 +28,6 @@ Welcome to **Hr.Ai**, the revolutionary AI-powered mock interview and assessment
 
 - **Frontend**:
 
-  - [Next.js](https://nextjs.org/): A powerful React framework for building fast and user-friendly web applications.
   - [React](https://reactjs.org/): A popular JavaScript library for building interactive user interfaces.
 
 - **Backend**:
@@ -38,7 +37,6 @@ Welcome to **Hr.Ai**, the revolutionary AI-powered mock interview and assessment
 
 - **AI Integration**:
 
-  - [TensorFlow](https://www.tensorflow.org/): An open-source machine learning framework for training and deploying AI models.
   - [OpenAI](https://openai.com/): State-of-the-art AI models for natural language processing and understanding.
 
 - **Database**:
@@ -48,11 +46,11 @@ Welcome to **Hr.Ai**, the revolutionary AI-powered mock interview and assessment
 
 **Hr.Ai** is brought to you by a dedicated and talented team:
 
-- **Yashaswee**: Lead Developer - Specializes in AI integration and backend development.
-- **Nainshi**: Frontend Developer - Expert in creating interactive and user-friendly interfaces.
-- **Satyam**: AI Specialist - Focuses on machine learning models and natural language processing.
-- **Vikash**: Full Stack Developer - Skilled in both frontend and backend development.
-- **Madhav**: Project Manager - Ensures seamless project execution and coordination among team members.
+- Yashaswee
+- Nainshi
+- Satyam
+- Vikash
+- Madhav
 
 ## Getting Started
 
