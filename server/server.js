@@ -4,13 +4,25 @@ const { join } = require("path");
 const transcribeAudio = require("./api/ai/speech-to-text");
 const textToSpeech = require("./api/ai/text-to-speech");
 const bodyParser = require("body-parser");
-require("dotenv").config();
+const connectDB = require("./lib/dbconnect");
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
 
+require("dotenv").config();
 const app = express();
-const port = process.env.DEV_PORT;
+const port = process.env.DEV_PORT || 3000;
+
+// Connect to MongoDB
+connectDB();
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+
+// Define authentication routes
+app.use("/auth", authRoutes);
+
+// Define user routes
+app.use("/user", userRoutes);
 
 // Configure multer for file uploads
 const upload = multer({ dest: "uploads/" });
