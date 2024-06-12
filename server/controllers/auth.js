@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const VCode = require("../models/VerificationCode");
 
 // Register a new user
 const register = async (req, res, next) => {
@@ -16,7 +17,15 @@ const register = async (req, res, next) => {
 
 		const user = new User({ username, email, password: password });
 		await user.save();
-		res.json({ message: "Registration successful" });
+
+		const verificationCode = new VCode({
+			email: user.email,
+			code: user.generateCode(),
+		});
+
+		await verificationCode.save();
+
+		res.json({ message: "Registration successful, Verify your email address" });
 	} catch (error) {
 		next(error);
 	}
@@ -45,4 +54,48 @@ const login = async (req, res, next) => {
 	}
 };
 
-module.exports = { register, login };
+/**
+ * Verify email address with a provided verification code.
+ * @param {Object} req - The request object containing `email` and `code` fields.
+ * @param {Object} res - The response object to send back the result.
+ * @param {Function} next - The next middleware function for error handling.
+ * @returns {Promise<void>}
+ */
+const verifyEmail = async (req, res, next) => {
+	const { email, code } = req.body;
+	try {
+		// Find the user by email
+		const user = await User.findOne({ email });
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// Check if the user is already verified
+		if (user.isVerified) {
+			return res.status(400).json({ message: "Email already verified" });
+		}
+
+		// Find the verification code associated with the user
+		const verificationCode = await VCode.findOne({
+			email: user.email,
+		});
+
+		if (!verificationCode) {
+			return res.status(400).json({ message: "No verification code found" });
+		}
+
+		// Verify the provided code
+		if (verificationCode.verifyCodes(code)) {
+			// Update user's verification status
+			user.isVerified = true;
+			await user.save();
+			res.json({ message: "Email verification successful" });
+		} else {
+			res.status(400).json({ message: "Invalid verification code" });
+		}
+	} catch (error) {
+		next(error); // Pass any caught errors to the error handling middleware
+	}
+};
+
+module.exports = { register, login, verifyEmail };

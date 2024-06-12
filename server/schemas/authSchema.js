@@ -15,7 +15,15 @@ const loginSchema = z.object({
 	}),
 });
 
+const verifyEmailSchema = z.object({
+	body: z.object({
+		email: z.string().email(),
+		code: z.string().length(6, "Verification code must be 6 digits"),
+	}),
+});
+
 module.exports = {
 	registerSchema,
 	loginSchema,
+	verifyEmailSchema,
 };
