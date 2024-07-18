@@ -1,16 +1,65 @@
-import "./App.css";
-import { Button } from "./components/ui/button";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "./components/ui/mode-toggle";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import Login from "./authentication/log-in";
+import Dashboard from "./dashboard/Dashboard";
+import Home from "./home/Home";
+import Scenario from "./dashboard/scenario/Scenario";
+import Interview from "./dashboard/interview/Interview";
+import SignUp from "./authentication/sign-up";
+import Error from "./components/Error";
+import { Setting } from "./dashboard/setting/Setting";
+import InterviewSession from "./session/InterviewSession";
 
 function App() {
 	return (
-		<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-			<div>
-				<Button>Ai Mock Interview</Button>
-				<ModeToggle></ModeToggle>s
-			</div>
-		</ThemeProvider>
+		<Router>
+			<Routes>
+				<Route path="/home" element={<Home />} />
+				<Route path="/log-in" element={<Login />} />
+				<Route path="/sign-up" element={<SignUp />} />
+				<Route
+					path="dashboard"
+					element={
+						<ProtectedRoute>
+							<Dashboard />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="scenario"
+					element={
+						<ProtectedRoute>
+							<Scenario />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="interview"
+					element={
+						<ProtectedRoute>
+							<Interview />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="session"
+					element={
+						<ProtectedRoute>
+							<InterviewSession />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="setting"
+					element={
+						<ProtectedRoute>
+							<Setting />
+						</ProtectedRoute>
+					}
+				/>
+				<Route path="*" element={<Error />} />
+			</Routes>
+		</Router>
 	);
 }
 

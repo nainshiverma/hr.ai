@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-
+const JobScenario = require("./JobScenario");
+const { jobScenarioSchema } = require("./JobScenario");
+const { interviewSessionSchema } = require("./interview/InterviewSession");
 const userSchema = new mongoose.Schema(
 	{
+		// googleId: { type: String, unique: true },
 		username: {
 			type: String,
 			required: true,
@@ -25,6 +28,14 @@ const userSchema = new mongoose.Schema(
 		isVerified: {
 			type: Boolean,
 			default: false,
+		},
+
+		jobScenarios: {
+			type: [jobScenarioSchema],
+		},
+
+		interviewSessions: {
+			type: [interviewSessionSchema],
 		},
 	},
 	{ timestamps: true }

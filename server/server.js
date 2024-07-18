@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 const connectDB = require("./lib/dbconnect");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const scenarioRoutes = require("./routes/scenario");
+const sessionRoutes = require("./routes/session");
+const interviewRoutes = require("./routes/interview");
 
 require("dotenv").config();
 const app = express();
@@ -23,6 +26,9 @@ app.use("/auth", authRoutes);
 
 // Define user routes
 app.use("/user", userRoutes);
+app.use("/scenario", scenarioRoutes);
+app.use("/session", sessionRoutes);
+app.use("/interview", interviewRoutes);
 
 // Configure multer for file uploads
 const upload = multer({ dest: "uploads/" });
