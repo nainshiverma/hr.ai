@@ -56,7 +56,7 @@ export default function SignUp() {
 						</div>
 						<div className="mt-4 text-center text-sm">
 							Already have an account?{" "}
-							<Link href="#" className="underline">
+							<Link to="/log-in" className="underline">
 								Sign in
 							</Link>
 						</div>
