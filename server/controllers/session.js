@@ -1,6 +1,6 @@
 const askQuestion = require("../api/ai/interview/ask");
 const genFeedback = require("../api/ai/interview/feedback");
-const genComprehension = require("../api/ai/interview/comprehend");
+// const genComprehension = require("../api/ai/interview/comprehend");
 const processInteraction = require("../api/ai/interview/interactionProcessing");
 const User = require("../models/User");
 /**
@@ -36,31 +36,31 @@ const issueFeedback = async (req, res, next) => {
 	}
 };
 
-const issueComprehension = async (req, res, next) => {
-	try {
-		// Extract chatHistory and tokenLimiter from the request body
-		const { chatHistory, tokenLimit } = req.body;
+// const issueComprehension = async (req, res, next) => {
+// 	try {
+// 		// Extract chatHistory and tokenLimiter from the request body
+// 		const { chatHistory, tokenLimit } = req.body;
 
-		if (!Array.isArray(chatHistory) || chatHistory.length === 0) {
-			return res
-				.status(400)
-				.json({ error: "chatHistory must be a non-empty array" });
-		}
+// 		if (!Array.isArray(chatHistory) || chatHistory.length === 0) {
+// 			return res
+// 				.status(400)
+// 				.json({ error: "chatHistory must be a non-empty array" });
+// 		}
 
-		if (!tokenLimit || typeof tokenLimit !== "number") {
-			return res.status(400).json({ error: "tokenLimiter must be a number" });
-		}
+// 		if (!tokenLimit || typeof tokenLimit !== "number") {
+// 			return res.status(400).json({ error: "tokenLimiter must be a number" });
+// 		}
 
-		// Generate comprehension using the generateComprehension function
-		const summary = await genComprehension(req, res);
+// 		// Generate comprehension using the generateComprehension function
+// 		const summary = await genComprehension(req, res);
 
-		// Return the summary
-		res.status(200).json({ summary });
-	} catch (error) {
-		console.error("Error comprehending chat history:", error);
-		res.status(500).json({ error: "Failed to comprehend chat history" });
-	}
-};
+// 		// Return the summary
+// 		res.status(200).json({ summary });
+// 	} catch (error) {
+// 		console.error("Error comprehending chat history:", error);
+// 		res.status(500).json({ error: "Failed to comprehend chat history" });
+// 	}
+// };
 
 const issueInteractionProcessing = async (req, res, next) => {
 	try {
@@ -142,7 +142,7 @@ const issueSessionData = async (req, res, next) => {
 module.exports = {
 	issueNextQuestion,
 	issueFeedback,
-	issueComprehension,
+	// issueComprehension,
 	issueInteractionProcessing,
 	issueSessionData,
 };

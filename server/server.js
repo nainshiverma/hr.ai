@@ -15,6 +15,10 @@ require("dotenv").config();
 const app = express();
 const port = process.env.DEV_PORT || 3000;
 
+var cors = require("cors");
+
+app.use(cors()); // Use this after the variable declaration
+
 // Connect to MongoDB
 connectDB();
 

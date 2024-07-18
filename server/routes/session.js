@@ -20,7 +20,7 @@ const {
 
 router.post("/nextQuestion", issueNextQuestion);
 router.post("/responseFeedback", issueFeedback);
-router.post("/comprehend", issueComprehension);
+// router.post("/comprehend", issueComprehension);
 router.post(
 	"/captureInteraction",
 	validate(interactionSchema),

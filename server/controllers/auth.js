@@ -3,7 +3,7 @@ const User = require("../models/User");
 
 const VCode = require("../models/VerificationCode");
 
-const sendVerificationEmail = require("../helpers/sendVerificationEmail");
+// const sendVerificationEmail = require("../helpers/sendVerificationEmail");
 
 const { OAuth2Client } = require("google-auth-library");
 
@@ -28,12 +28,12 @@ const register = async (req, res, next) => {
 		});
 
 		await verificationCode.save();
-		const emailResponse = await sendVerificationEmail(
-			email,
-			username,
-			verifyCode
-		);
-		console.log(emailResponse);
+		// const emailResponse = await sendVerificationEmail(
+		// 	email,
+		// 	username,
+		// 	verifyCode
+		// );
+		// console.log(emailResponse);
 
 		if (!emailResponse.success) {
 			return Response.json(
