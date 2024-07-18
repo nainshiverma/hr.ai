@@ -8,7 +8,7 @@ export const getUserId = async (token) => {
 		let config = {
 			method: "post",
 			maxBodyLength: Infinity,
-			url: "http://localhost:3000/auth/decode-token",
+			url: `${import.meta.env.VITE_BACKEND_URI}/auth/decode-token`,
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -34,7 +34,9 @@ export const fetchNextQuestion = async (userId, jobScenarioId) => {
 	try {
 		// Fetch jobScenario object from your server
 		const response = await axios.get(
-			`http://localhost:3000/scenario/api?userId=${userId}&jobScenarioId=${jobScenarioId}`
+			`${
+				import.meta.env.VITE_BACKEND_URI
+			}/scenario/api?userId=${userId}&jobScenarioId=${jobScenarioId}`
 		);
 		if (response.status !== 200) {
 			throw new Error("Failed to fetch job scenario");
@@ -47,7 +49,7 @@ export const fetchNextQuestion = async (userId, jobScenarioId) => {
 		let config = {
 			method: "post",
 			maxBodyLength: Infinity,
-			url: "http://localhost:3000/session/nextQuestion",
+			url: `${import.meta.env.VITE_BACKEND_URI}/session/nextQuestion`,
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -77,7 +79,9 @@ export const fetchInterviewSessionData = async (userId, interviewSessionId) => {
 		const config = {
 			method: "get",
 			maxBodyLength: Infinity,
-			url: `http://localhost:3000/session?userId=${userId}&interviewSessionId=${interviewSessionId}`,
+			url: `${
+				import.meta.env.VITE_BACKEND_URI
+			}/session?userId=${userId}&interviewSessionId=${interviewSessionId}`,
 			headers: {},
 		};
 
@@ -125,7 +129,7 @@ export const callIssueInteractionProcessing = async (
 		let config = {
 			method: "post",
 			maxBodyLength: Infinity,
-			url: "http://localhost:3000/session/captureInteraction",
+			url: `${import.meta.env.VITE_BACKEND_URI}/session/captureInteraction`,
 			headers: {
 				"Content-Type": "application/json",
 			},

@@ -54,7 +54,7 @@ function CreateScenarioForm() {
 		try {
 			// newJobScenarioSchema.parse(data); // Validate data with Zod schema
 			setErrors({}); // Clear errors if validation passes
-			await axios.post("http://localhost:3000/scenario", data);
+			await axios.post(`${import.meta.env.VITE_BACKEND_URI}/scenario`, data);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				const fieldErrors = error.errors.reduce((acc, curr) => {

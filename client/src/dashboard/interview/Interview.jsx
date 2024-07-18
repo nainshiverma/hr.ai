@@ -25,7 +25,7 @@ function Interview({ userId }) {
 				let config = {
 					method: "get",
 					maxBodyLength: Infinity,
-					url: `http://localhost:3000/interview?user=${userId}`,
+					url: `${import.meta.env.VITE_BACKEND_URI}/interview?user=${userId}`,
 					headers: {},
 				};
 				const response = await axios.request(config);

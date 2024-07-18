@@ -40,7 +40,7 @@ function Scenario({ userId }) {
 		};
 
 		try {
-			await axios.post("http://localhost:3000/scenario", data);
+			await axios.post(`${import.meta.env.VITE_BACKEND_URI}/scenario`, data);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				const fieldErrors = error.errors.reduce((acc, curr) => {
@@ -67,7 +67,7 @@ function Scenario({ userId }) {
 				let config = {
 					method: "get",
 					maxBodyLength: Infinity,
-					url: `http://localhost:3000/scenario?user=${userId}`,
+					url: `${import.meta.env.VITE_BACKEND_URI}/scenario?user=${userId}`,
 					headers: {},
 				};
 				const response = await axios.request(config);

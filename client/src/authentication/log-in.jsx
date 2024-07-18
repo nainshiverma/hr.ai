@@ -25,7 +25,7 @@ export default function Login() {
 		//TODO: Make the URL Consistent by adding it to the .env file and referencing it here.
 		try {
 			const response1 = await axios.post(
-				"http://localhost:3000/auth/login",
+				`${import.meta.env.VITE_BACKEND_URI}/auth/login`,
 				data
 			);
 
