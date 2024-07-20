@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import "../App.css";
 import Navbar from "../components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";

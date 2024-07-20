@@ -16,7 +16,7 @@ import InputOTPForm from "./authentication/otp-input";
 function App() {
 	return (
 		<NetworkStatusProvider>
-			<Toaster position="top-center" richColors />
+			<Toaster position="bottom-right" richColors />
 			<NetworkStatusHandler />
 			<Router>
 				<Routes>

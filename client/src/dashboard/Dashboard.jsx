@@ -89,6 +89,7 @@ function Dashboard() {
 	};
 
 	return (
+		// <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(100%_50%_at_50%_0%,rgba(0,163,255,0.13)_0,rgba(0,163,255,0)_50%,rgba(0,163,255,0)_100%)]">
 		<div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
 			<div className="hidden border-r bg-muted/40 md:block">
 				<div className="flex h-full max-h-screen flex-col gap-2">
@@ -285,9 +286,11 @@ function Dashboard() {
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</header>
+
 				{renderComponent()}
 			</div>
 		</div>
+		// </div>
 	);
 }
 

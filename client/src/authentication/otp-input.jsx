@@ -1,10 +1,12 @@
 "use client";
 
+import { LoadingButton } from "@/components/ui/loading-button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "sonner";
-
+import { toast, Toaster } from "sonner";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -27,6 +29,7 @@ import {
 	TextureCardFooter,
 	TextureCardTitle,
 } from "@/components/ui/texture-card";
+import { verifyOTP } from "@/helpers/authAPI";
 
 const FormSchema = z.object({
 	pin: z.string().min(6, {
@@ -42,58 +45,87 @@ export default function InputOTPForm() {
 		},
 	});
 
-	function onSubmit(data) {
-		toast({
-			title: "You submitted the following values:",
-			description: (
-				<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-					<code className="text-white">{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
-		});
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
+	async function onSubmit(data) {
+		setLoading(true);
+		try {
+			const response = await verifyOTP(data.pin);
+			// if (response.response.status != 200) {
+			// 	toast.error(response.message);
+			// }
+			toast.success("Email Verified Successfully");
+			navigate("/dashboard");
+		} catch (error) {
+			console.log(error);
+			// toast.error();
+		} finally {
+			setLoading(false);
+		}
 	}
 
 	return (
-		<div className="flex items-center justify-center min-h-screen bg-gray-100">
-			<TextureCard className="w-full max-w-md">
-				<TextureCardHeader>
-					<TextureCardTitle>Verify Your Email</TextureCardTitle>
-				</TextureCardHeader>
-				<TextureCardContent>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-							<FormField
-								control={form.control}
-								name="pin"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>One-Time Password</FormLabel>
-										<FormControl>
-											<InputOTP maxLength={6} {...field}>
-												<InputOTPGroup>
-													<InputOTPSlot index={0} />
-													<InputOTPSlot index={1} />
-													<InputOTPSlot index={2} />
-													<InputOTPSlot index={3} />
-													<InputOTPSlot index={4} />
-													<InputOTPSlot index={5} />
-												</InputOTPGroup>
-											</InputOTP>
-										</FormControl>
-										<FormDescription>
-											Please enter the one-time password sent to your email.
-										</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<TextureCardFooter>
-								<Button type="submit">Submit</Button>
-							</TextureCardFooter>
-						</form>
-					</Form>
-				</TextureCardContent>
-			</TextureCard>
+		<div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+			<div className="min-h-screen flex items-center justify-center">
+				<Toaster position="top-center" richColors />
+				<div className="grid gap-2 text-left">
+					<TextureCard className="mx-auto max-w-sm">
+						<TextureCardHeader>
+							<TextureCardTitle clasname="text-xl pl-6">
+								Verify Your Email
+							</TextureCardTitle>
+						</TextureCardHeader>
+						<TextureCardContent>
+							<Form {...form}>
+								<form onSubmit={form.handleSubmit(onSubmit)}>
+									<div className="grid gap-4">
+										<div className="grid gap-2"></div>
+										<FormField
+											control={form.control}
+											name="pin"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>One-Time Password</FormLabel>
+													<FormControl>
+														<InputOTP maxLength={6} {...field}>
+															<InputOTPGroup>
+																<InputOTPSlot index={0} />
+																<InputOTPSlot index={1} />
+																<InputOTPSlot index={2} />
+																<InputOTPSlot index={3} />
+																<InputOTPSlot index={4} />
+																<InputOTPSlot index={5} />
+															</InputOTPGroup>
+														</InputOTP>
+													</FormControl>
+													<FormDescription clasname="text-sm">
+														Please enter the one-time password sent to your
+														email.
+													</FormDescription>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<TextureCardFooter>
+											{loading ? (
+												<LoadingButton loading></LoadingButton>
+											) : (
+												<Button
+													variant="shine"
+													type="submit"
+													className="w-full"
+												>
+													Verify
+												</Button>
+											)}
+										</TextureCardFooter>
+									</div>
+								</form>
+							</Form>
+						</TextureCardContent>
+					</TextureCard>
+				</div>
+			</div>
 		</div>
 	);
 }
