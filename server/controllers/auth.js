@@ -110,12 +110,12 @@ const verifyEmail = async (req, res, next) => {
 		// Find the user by email
 		const user = await User.findOne({ email });
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(404).json({ message: `${email} does not exists` });
 		}
 
 		// Check if the user is already verified
 		if (user.isVerified) {
-			return res.status(400).json({ message: "Email already verified" });
+			return res.status(400).json({ message: "Email already Verified" });
 		}
 
 		// Find the verification code associated with the user
@@ -132,10 +132,10 @@ const verifyEmail = async (req, res, next) => {
 			// Update user's verification status
 			user.isVerified = true;
 			await user.save();
-			res.json({ message: "Email verification successful" });
+			res.status(200).json({ message: "Email Verification Successful" });
 			//!TODO Add a feature where the OTP is deleted after verification is done.
 		} else {
-			res.status(400).json({ message: "Invalid verification code" });
+			res.status(400).json({ message: "Verification Code is Invalid" });
 		}
 	} catch (error) {
 		next(error); // Pass any caught errors to the error handling middleware
