@@ -1,21 +1,25 @@
 const express = require("express");
 const { validate } = require("../middlewares/validateSchema");
 const {
-	createJobScenario,
-	listJobScenarios,
-	getJobScenario,
+	createScenario,
+	listScenarios,
+	getScenario,
+	updateScenario,
+	deleteScenario,
 } = require("../controllers/scenario");
 const router = express.Router();
 
 const {
 	newJobScenarioSchema,
-	listJobScenariosSchema,
-} = require("../schemas/jobSchema");
-const {
-	getJobScenarioByUserById,
-} = require("../schemas/interviewSessionSchema");
+	listScenariosSchema,
+	getScenarioSchema,
+} = require("../schemas/scenarioSchema");
+const { getScenarioByUserById } = require("../schemas/interviewSessionSchema");
 
-router.post("/", validate(newJobScenarioSchema), createJobScenario);
-router.get("/", validate(listJobScenariosSchema), listJobScenarios);
-router.get("/api", validate(getJobScenarioByUserById), getJobScenario);
+router.post("/", validate(newJobScenarioSchema), createScenario);
+router.get("/:scenarioId", validate(getScenarioSchema), getScenario);
+router.get("/", validate(listScenariosSchema), listScenarios);
+router.patch("/:scenarioId", updateScenario);
+router.delete("/:scenarioId", deleteScenario);
+
 module.exports = router;

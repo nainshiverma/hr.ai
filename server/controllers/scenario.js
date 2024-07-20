@@ -1,32 +1,24 @@
+var mongoose = require("mongoose");
 const JobScenario = require("../models/JobScenario");
 const User = require("../models/User");
 const ObjectId = require("mongodb").ObjectId;
 User;
 
 // Function to create a new JobScenario
-const createJobScenario = async (req, res, next) => {
+const createScenario = async (req, res, next) => {
 	try {
-		const { user, jobTitle, jobDescription, experience, company } = req.body;
+		const { userId, jobTitle, jobDescription, experience, company } = req.body;
 
 		// Create a new JobScenario instance
 		const jobScenario = new JobScenario({
-			user,
-			jobTitle,
-			jobDescription,
-			experience,
-			company,
+			userId: userId,
+			jobTitle: jobTitle,
+			jobDescription: jobDescription,
+			experience: experience,
+			company: company,
 		});
 
-		// Find the user and add the jobScenario to their jobScenarios array
-		const updatedUser = await User.findByIdAndUpdate(
-			user,
-			{ $push: { jobScenarios: jobScenario } },
-			{ new: true, useFindAndModify: false }
-		);
-
-		if (!updatedUser) {
-			return res.status(404).json({ message: "User not found." });
-		}
+		await jobScenario.save();
 
 		// Respond with the created JobScenario
 		res.status(201).json(jobScenario);
@@ -37,21 +29,26 @@ const createJobScenario = async (req, res, next) => {
 };
 
 // Function to list all JobScenarios created by a specific user
-const listJobScenarios = async (req, res, next) => {
-	const id = req.query["user"];
+const listScenarios = async (req, res, next) => {
+	const { userId } = req.query;
 	try {
-		const user = await User.findById(id).select("jobScenarios");
-
-		// Check if the user exists and has jobScenarios
-		if (!user) {
-			return res.status(404).json({ message: "User Not Found" });
-		}
-		if (!user.jobScenarios.length) {
+		// Use aggregation pipeline to find all JobScenarios by userId
+		const uid = new mongoose.Types.ObjectId(userId);
+		const jobScenarios = await JobScenario.aggregate([
+			{
+				$match: {
+					userId: uid,
+				},
+			},
+		]);
+		// Check if jobScenarios were found
+		if (!jobScenarios.length) {
 			return res
 				.status(404)
 				.json({ message: "No job scenarios found for this user." });
 		}
-		res.status(200).json(user.jobScenarios);
+
+		res.status(200).json(jobScenarios);
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -67,35 +64,23 @@ const listJobScenarios = async (req, res, next) => {
  * @param {object} res - Express response object
  * @param {function} next - Express next function for error handling
  */
-const getJobScenario = async (req, res, next) => {
-	const { userId, jobScenarioId } = req.query;
+const getScenario = async (req, res, next) => {
+	const { scenarioId } = req.params;
 	try {
-		// Validate userId and jobScenarioId
-		if (!ObjectId.isValid(userId) || !ObjectId.isValid(jobScenarioId)) {
-			return res
-				.status(400)
-				.json({ message: "Invalid userId or jobScenarioId" });
+		// Validate jobScenarioId
+		if (!mongoose.Types.ObjectId.isValid(scenarioId)) {
+			return res.status(400).json({ message: "Invalid scenarioId" });
 		}
 
-		// Find the user and check if jobScenarioId exists in their jobScenarios
-		const user = await User.findById(userId);
+		// Find the JobScenario by its id
+		const scenario = await JobScenario.findById(scenarioId);
 
-		if (!user) {
-			return res.status(404).json({ message: "User not found" });
-		}
-
-		const jobScenario = user.jobScenarios.find(
-			(js) => js._id.toString() === jobScenarioId
-		);
-
-		if (!jobScenario) {
-			return res
-				.status(404)
-				.json({ message: "JobScenario not found for this user" });
+		if (!scenario) {
+			return res.status(404).json({ message: "Scenario not found" });
 		}
 
 		// Respond with the jobScenario object
-		res.status(200).json(jobScenario);
+		res.status(200).json(scenario);
 	} catch (error) {
 		console.error("Error fetching jobScenario:", error);
 		next(error);
@@ -103,8 +88,49 @@ const getJobScenario = async (req, res, next) => {
 	}
 };
 
+const updateScenario = async (req, res, next) => {
+	try {
+		const { scenarioId } = req.params; // Get the scenarioId from the request parameters
+		const { jobTitle, jobDescription, experience, company } = req.body; // Get the updatable fields from the request body
+
+		// Find the scenario by ID and update the provided fields
+		const updatedScenario = await JobScenario.findByIdAndUpdate(
+			scenarioId,
+			{ jobTitle, jobDescription, experience, company },
+			{ new: true, runValidators: true } // Return the updated document and run validators
+		);
+
+		if (!updatedScenario) {
+			return res.status(404).json({ message: "Scenario not found" });
+		}
+
+		res.status(200).json(updatedScenario); // Send the updated scenario in the response
+	} catch (error) {
+		next(error); // Pass errors to the error handling middleware
+	}
+};
+
+const deleteScenario = async (req, res, next) => {
+	try {
+		const { scenarioId } = req.params; // Get the scenarioId from the request parameters
+
+		// Find the scenario by ID and delete it
+		const deletedScenario = await JobScenario.findByIdAndDelete(scenarioId);
+
+		if (!deletedScenario) {
+			return res.status(404).json({ message: "Scenario not found" });
+		}
+
+		res.status(200).json({ message: "Scenario deleted successfully" }); // Send a success message in the response
+	} catch (error) {
+		next(error); // Pass errors to the error handling middleware
+	}
+};
+
 module.exports = {
-	createJobScenario,
-	listJobScenarios,
-	getJobScenario,
+	createScenario,
+	listScenarios,
+	getScenario,
+	updateScenario,
+	deleteScenario,
 };

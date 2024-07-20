@@ -3,13 +3,13 @@ const User = require("../models/User");
 
 const VCode = require("../models/VerificationCode");
 
-// const sendVerificationEmail = require("../helpers/sendVerificationEmail");
+const Email = require("../helpers/sendVerificationEmail");
 
 const { OAuth2Client } = require("google-auth-library");
 
 // Register a new user
 const register = async (req, res, next) => {
-	const { username, email, password } = req.body;
+	const { firstName, lastName, username, email, password } = req.body;
 
 	try {
 		const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -19,21 +19,25 @@ const register = async (req, res, next) => {
 				.json({ message: "Username or email already in use" });
 		}
 
-		const user = new User({ username, email, password: password });
+		const user = new User({
+			firstName,
+			lastName,
+			username,
+			email,
+			password: password,
+		});
 		await user.save();
 
+		const verifyCode = user.generateCode();
 		const verificationCode = new VCode({
 			email: user.email,
-			code: user.generateCode(),
+			code: verifyCode,
 		});
 
 		await verificationCode.save();
-		// const emailResponse = await sendVerificationEmail(
-		// 	email,
-		// 	username,
-		// 	verifyCode
-		// );
-		// console.log(emailResponse);
+		const emailResponse = await Email(email, firstName, verifyCode);
+
+		console.log(emailResponse);
 
 		if (!emailResponse.success) {
 			return Response.json(
@@ -42,7 +46,7 @@ const register = async (req, res, next) => {
 			);
 		}
 
-		res.json({ message: "Registration successful, Verify your email address" });
+		res.json({ username: username });
 	} catch (error) {
 		next(error);
 	}
@@ -57,15 +61,37 @@ const login = async (req, res, next) => {
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
 		}
+
+		if (!user.isVerified) {
+			return res.status(403).json({ message: "User not verified" });
+		}
+
 		const passwordMatch = await user.comparePassword(password);
 		if (!passwordMatch) {
 			return res.status(401).json({ message: "Password do not match" });
 		}
 
-		const token = sign.sign({ userId: user._id }, process.env.SECRET_KEY, {
-			expiresIn: "1 hour",
-		});
+		const token = sign.sign(
+			{ userId: user._id, first: user.firstName },
+			process.env.SECRET_KEY,
+			{
+				expiresIn: "1 hour",
+			}
+		);
 		res.json({ token });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const checkUsername = async (req, res, next) => {
+	const { username } = req.params;
+	try {
+		const existingUser = await User.findOne({ username });
+		if (!existingUser) {
+			return res.status(200).json({ status: true });
+		}
+		return res.status(200).json({ status: false });
 	} catch (error) {
 		next(error);
 	}
@@ -98,11 +124,11 @@ const verifyEmail = async (req, res, next) => {
 		});
 
 		if (!verificationCode) {
-			return res.status(400).json({ message: "No verification code found" });
+			return res.status(400).json({ message: "Code Expired" });
 		}
 
 		// Verify the provided code
-		if (verificationCode.verifyCodes(code)) {
+		if (verificationCode.verifyCode(code)) {
 			// Update user's verification status
 			user.isVerified = true;
 			await user.save();
@@ -161,4 +187,11 @@ const decodeToken = async (req, res, next) => {
 	}
 };
 
-module.exports = { register, login, verifyEmail, googleLogin, decodeToken };
+module.exports = {
+	register,
+	login,
+	verifyEmail,
+	googleLogin,
+	decodeToken,
+	checkUsername,
+};

@@ -24,9 +24,8 @@ const jobScenarioSchema = new mongoose.Schema(
 			required: [true, "Company is required"],
 			trim: true,
 		},
-		user: {
+		userId: {
 			type: mongoose.Schema.Types.ObjectId,
-			required: [true, "user Id is required"],
 			ref: "User",
 		},
 	},

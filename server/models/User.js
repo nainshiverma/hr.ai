@@ -5,11 +5,18 @@ const { jobScenarioSchema } = require("./JobScenario");
 const { interviewSessionSchema } = require("./interview/InterviewSession");
 const userSchema = new mongoose.Schema(
 	{
-		// googleId: { type: String, unique: true },
 		username: {
 			type: String,
 			required: true,
 			unique: true,
+		},
+		firstName: {
+			type: String,
+			required: true,
+		},
+		lastName: {
+			type: String,
+			required: true,
 		},
 		email: {
 			type: String,

@@ -37,7 +37,7 @@ const listInterviewSessionSchema = z.object({
 	}),
 });
 
-const getJobScenarioByUserById = z.object({
+const getScenarioByUserById = z.object({
 	query: z.object({
 		userId: z
 			.string()
@@ -75,7 +75,7 @@ const sessionDataSchema = z.object({
 module.exports = {
 	newInterviewSessionSchema,
 	listInterviewSessionSchema,
-	getJobScenarioByUserById,
+	getScenarioByUserById,
 	interactionSchema,
 	sessionDataSchema,
 };

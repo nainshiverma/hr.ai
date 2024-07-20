@@ -22,8 +22,20 @@ const verifyEmailSchema = z.object({
 	}),
 });
 
+const checkUserameSchema = z.object({
+	params: z.object({
+		username: z
+			.string()
+			.min(4, { message: "Username must be at least 4 characters long" })
+			.regex(/^[a-zA-Z0-9-]+$/, {
+				message: "Username can only contain letters, numbers, and hyphens",
+			}),
+	}),
+});
+
 module.exports = {
 	registerSchema,
 	loginSchema,
 	verifyEmailSchema,
+	checkUserameSchema,
 };
