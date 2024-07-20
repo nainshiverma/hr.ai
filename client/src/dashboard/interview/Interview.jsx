@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,14 +11,17 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-function handleStartSession(_id) {
-	window.location.href = `./session?interviewSessionId=${_id}`; // Redirect to a protected route
-}
-
+import { ProgressBar } from "@/components/ProgressBar";
 function Interview({ userId }) {
+	const navigate = useNavigate();
 	const [sessions, setsessions] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+
+	const handleStartSession = (_id) => {
+		navigate(`./session?interviewSessionId=${_id}`);
+	};
+
 	useEffect(() => {
 		// Fetch sessions from the server
 		const fetchsessions = async () => {
@@ -45,7 +49,11 @@ function Interview({ userId }) {
 	}, [userId]);
 
 	if (loading) {
-		return <p>Loading...</p>;
+		return (
+			<p>
+				<ProgressBar></ProgressBar>
+			</p>
+		);
 	}
 
 	if (error) {
@@ -81,7 +89,7 @@ function Interview({ userId }) {
 							</CardHeader>
 							<CardContent></CardContent>
 							<CardFooter>
-								<Button onClick={handleStartSession(session._id)}>
+								<Button onClick={() => handleStartSession(session._id)}>
 									Start Interview
 								</Button>
 							</CardFooter>

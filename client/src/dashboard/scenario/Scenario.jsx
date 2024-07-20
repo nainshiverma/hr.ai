@@ -1,5 +1,4 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -7,9 +6,9 @@ import {
 	CardDescription,
 	CardHeader,
 	CardTitle,
+	CardFooter,
 } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ProgressBar";
-
 import {
 	Dialog,
 	DialogContent,
@@ -22,17 +21,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import * as z from "zod";
+import {
+	listScenarios,
+	createScenario,
+	updateScenario,
+	deleteScenario,
+} from "@/helpers/scenarioAPI";
+
 function Scenario({ userId }) {
 	const [title, setTitle] = useState("");
 	const [company, setCompany] = useState("");
 	const [description, setDescription] = useState("");
 	const [experience, setExperience] = useState("");
 	const [errors, setErrors] = useState({});
+	const [editingScenario, setEditingScenario] = useState(null);
 
-	const handleSubmit = async (e) => {
+	const handleSave = async (e) => {
 		e.preventDefault();
+
 		const data = {
-			user: userId,
+			userId: userId,
 			jobTitle: title,
 			jobDescription: description,
 			experience: parseInt(experience, 10),
@@ -40,7 +48,15 @@ function Scenario({ userId }) {
 		};
 
 		try {
-			await axios.post(`${import.meta.env.VITE_BACKEND_URI}/scenario`, data);
+			if (editingScenario) {
+				await updateScenario(editingScenario._id, data);
+				setEditingScenario(null);
+			} else {
+				await createScenario(data);
+			}
+			const response = await listScenarios(userId);
+			setScenarios(response);
+			handleClose();
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				const fieldErrors = error.errors.reduce((acc, curr) => {
@@ -54,28 +70,49 @@ function Scenario({ userId }) {
 		}
 	};
 
+	// const handleDelete = async (id) => {
+	// 	try {
+	// 		await deleteScenario(id);
+	// 		const response = await listScenarios(userId);
+	// 		setScenarios(response);
+	// 	} catch (error) {
+	// 		console.error("Error deleting scenario:", error);
+	// 	}
+	// };
+
+	const handleEdit = useCallback((scenario) => {
+		// setEditingScenario(scenario);
+		// setTitle(scenario.jobTitle);
+		// setCompany(scenario.company);
+		// setDescription(scenario.jobDescription);
+		// setExperience(scenario.experience.toString());
+		// handleOpen();
+	}, []);
+
 	const [scenarios, setScenarios] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const handleOpen = () => setIsOpen(true);
-	const handleClose = () => setIsOpen(false);
+	const handleClose = () => {
+		setIsOpen(false);
+		setEditingScenario(null);
+		setTitle("");
+		setCompany("");
+		setDescription("");
+		setExperience("");
+		setErrors({});
+	};
+
 	useEffect(() => {
-		// Fetch scenarios from the server
 		const fetchScenarios = async () => {
+			setLoading(true);
 			try {
-				let config = {
-					method: "get",
-					maxBodyLength: Infinity,
-					url: `${import.meta.env.VITE_BACKEND_URI}/scenario?user=${userId}`,
-					headers: {},
-				};
-				const response = await axios.request(config);
-				console.log(response);
-				setScenarios(response.data);
+				const response = await listScenarios(userId);
+				setScenarios(response);
 			} catch (err) {
 				if (err.response && err.response.status === 404) {
-					setScenarios([]); // No scenarios found
+					setScenarios([]);
 				} else {
 					setError(err.message);
 				}
@@ -88,7 +125,7 @@ function Scenario({ userId }) {
 	}, [userId]);
 
 	if (loading) {
-		return <ProgressBar></ProgressBar>;
+		return <ProgressBar />;
 	}
 
 	if (error) {
@@ -107,99 +144,95 @@ function Scenario({ userId }) {
 							You have no Scenarios
 						</h3>
 						<p className="text-sm text-muted-foreground">
-							You can start interviewing as soon as you add a Scenario.
+							You can start scheduling sessions as soon as you add a Scenario.
 						</p>
-						<Dialog>
+						<Dialog isOpen={isOpen} onOpenChange={setIsOpen}>
 							<DialogTrigger asChild>
-								<Button className="mt-4" variant="outline" onClick={handleOpen}>
+								<Button
+									className="mt-4"
+									variant="outline"
+									onClick={() => handleOpen}
+								>
 									Add Scenario
 								</Button>
 							</DialogTrigger>
 							<DialogContent className="sm:max-w-[425px]">
 								<DialogHeader>
-									<DialogTitle>Add Scenario</DialogTitle>
+									<DialogTitle>
+										{editingScenario ? "Edit Scenario" : "Add Scenario"}
+									</DialogTitle>
 								</DialogHeader>
-								<Card x-chunk="dashboard-07-chunk-0">
-									<CardHeader>
-										<CardTitle>Scenario Details</CardTitle>
-										<CardDescription>
-											Lipsum dolor sit amet, consectetur adipiscing elit
-										</CardDescription>
-									</CardHeader>
-									<CardContent>
-										<form onSubmit={handleSubmit} className="grid gap-6">
-											<div className="grid gap-3">
-												<Label htmlFor="title">Job Title</Label>
-												<Input
-													id="title"
-													placeholder="Machine Learning Senior Engineer"
-													type="text"
-													className="w-full"
-													value={title}
-													onChange={(e) => setTitle(e.target.value)}
-												/>
-												{errors.jobTitle && (
-													<span className="text-red-500">
-														{errors.jobTitle}
-													</span>
-												)}
-											</div>
-											<div className="grid gap-3">
-												<Label htmlFor="company">Institution</Label>
-												<Input
-													id="company"
-													placeholder="Amazon"
-													type="text"
-													className="w-full"
-													value={company}
-													onChange={(e) => setCompany(e.target.value)}
-												/>
-												{errors.company && (
-													<span className="text-red-500">{errors.company}</span>
-												)}
-											</div>
-											<div className="grid gap-3">
-												<Label htmlFor="description">Job Description</Label>
-												<Textarea
-													id="description"
-													placeholder="Paste Job Description here"
-													className="min-h-32"
-													value={description}
-													onChange={(e) => setDescription(e.target.value)}
-												/>
-												{errors.jobDescription && (
-													<span className="text-red-500">
-														{errors.jobDescription}
-													</span>
-												)}
-											</div>
-											<div className="grid gap-3">
-												<Label htmlFor="experience">Experience</Label>
-												<Input
-													type="number"
-													id="experience"
-													value={experience}
-													onChange={(e) => setExperience(e.target.value)}
-												/>
-												{errors.experience && (
-													<span className="text-red-500">
-														{errors.experience}
-													</span>
-												)}
-											</div>
-											<div className="flex items-center gap-2">
-												<Button variant="outline" size="sm" type="reset">
-													Discard
-												</Button>
-												<Button size="sm" type="submit">
-													Save Scenario
-												</Button>
-											</div>
-										</form>
-									</CardContent>
-								</Card>
+								<form onSubmit={handleSave} className="grid gap-6">
+									<div className="grid gap-3">
+										<Label htmlFor="title">Job Title</Label>
+										<Input
+											id="title"
+											placeholder="Machine Learning Senior Engineer"
+											type="text"
+											className="w-full"
+											value={title}
+											onChange={(e) => setTitle(e.target.value)}
+										/>
+										{errors.jobTitle && (
+											<span className="text-red-500">{errors.jobTitle}</span>
+										)}
+									</div>
+									<div className="grid gap-3">
+										<Label htmlFor="company">Institution</Label>
+										<Input
+											id="company"
+											placeholder="Amazon"
+											type="text"
+											className="w-full"
+											value={company}
+											onChange={(e) => setCompany(e.target.value)}
+										/>
+										{errors.company && (
+											<span className="text-red-500">{errors.company}</span>
+										)}
+									</div>
+									<div className="grid gap-3">
+										<Label htmlFor="description">Job Description</Label>
+										<Textarea
+											id="description"
+											placeholder="Paste Job Description here"
+											className="min-h-32"
+											value={description}
+											onChange={(e) => setDescription(e.target.value)}
+										/>
+										{errors.jobDescription && (
+											<span className="text-red-500">
+												{errors.jobDescription}
+											</span>
+										)}
+									</div>
+									<div className="grid gap-3">
+										<Label htmlFor="experience">Experience</Label>
+										<Input
+											type="number"
+											id="experience"
+											value={experience}
+											onChange={(e) => setExperience(e.target.value)}
+										/>
+										{errors.experience && (
+											<span className="text-red-500">{errors.experience}</span>
+										)}
+									</div>
+								</form>
 								<DialogFooter>
-									<Button onClick={handleClose}>Close</Button>
+									<div className="flex items-center gap-2">
+										<Button
+											variant="outline"
+											size="sm"
+											type="reset"
+											onClick={handleClose}
+										>
+											Discard
+										</Button>
+										<Button size="sm" type="submit" onClick={handleSave}>
+											Save Scenario
+										</Button>
+									</div>
 								</DialogFooter>
 							</DialogContent>
 						</Dialog>
@@ -217,8 +250,111 @@ function Scenario({ userId }) {
 								<p>{scenario.jobDescription}</p>
 								<p>Experience: {scenario.experience} years</p>
 							</CardContent>
+							<CardFooter className="flex justify-between">
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={handleEdit(scenario)}
+								>
+									Edit
+								</Button>
+								<Button variant="destructive" size="sm">
+									Delete
+								</Button>
+							</CardFooter>
 						</Card>
 					))}
+					<Card
+						className="flex flex-col justify-center items-center cursor-pointer"
+						onClick={handleOpen}
+					>
+						<Dialog isOpen={isOpen} onOpenChange={setIsOpen}>
+							<DialogTrigger asChild>
+								<Button
+									className="mt-4 border-0 border-dashed"
+									variant="ghost"
+									border-0
+									onClick={() => handleOpen}
+								>
+									+
+								</Button>
+							</DialogTrigger>
+							<DialogContent className="sm:max-w-[425px]">
+								<DialogHeader>
+									<DialogTitle>
+										{editingScenario ? "Edit Scenario" : "Add Scenario"}
+									</DialogTitle>
+								</DialogHeader>
+								<form className="grid gap-6">
+									<div className="grid gap-3">
+										<Label htmlFor="title">Job Title</Label>
+										<Input
+											id="title"
+											placeholder="Machine Learning Senior Engineer"
+											type="text"
+											className="w-full"
+											value={title}
+											onChange={(e) => setTitle(e.target.value)}
+										/>
+										{errors.jobTitle && (
+											<span className="text-red-500">{errors.jobTitle}</span>
+										)}
+									</div>
+									<div className="grid gap-3">
+										<Label htmlFor="company">Institution</Label>
+										<Input
+											id="company"
+											placeholder="Amazon"
+											type="text"
+											className="w-full"
+											value={company}
+											onChange={(e) => setCompany(e.target.value)}
+										/>
+										{errors.company && (
+											<span className="text-red-500">{errors.company}</span>
+										)}
+									</div>
+									<div className="grid gap-3">
+										<Label htmlFor="description">Job Description</Label>
+										<Textarea
+											id="description"
+											placeholder="Paste Job Description here"
+											className="min-h-32"
+											value={description}
+											onChange={(e) => setDescription(e.target.value)}
+										/>
+										{errors.jobDescription && (
+											<span className="text-red-500">
+												{errors.jobDescription}
+											</span>
+										)}
+									</div>
+									<div className="grid gap-3">
+										<Label htmlFor="experience">Experience</Label>
+										<Input
+											type="number"
+											id="experience"
+											value={experience}
+											onChange={(e) => setExperience(e.target.value)}
+										/>
+										{errors.experience && (
+											<span className="text-red-500">{errors.experience}</span>
+										)}
+									</div>
+								</form>
+								<DialogFooter>
+									<div className="flex items-center gap-2">
+										<Button variant="outline" size="sm" type="reset">
+											Discard
+										</Button>
+										<Button onClick={handleSave} size="sm" type="submit">
+											Save Scenario
+										</Button>
+									</div>
+								</DialogFooter>
+							</DialogContent>
+						</Dialog>
+					</Card>
 				</div>
 			)}
 		</main>

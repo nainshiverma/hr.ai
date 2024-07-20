@@ -5,11 +5,13 @@ import { Label } from "../components/ui/label";
 
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Toggle } from "../components/ui/toggle";
 
 export default function Login() {
+	const navigate = useNavigate();
 	const {
 		register,
 		handleSubmit,
@@ -30,7 +32,7 @@ export default function Login() {
 			);
 
 			localStorage.setItem("token", response1.data.token);
-			window.location.href = "/dashboard"; // Redirect to a protected route
+			navigate("/dashboard"); // Redirect to a protected route
 		} catch (err) {
 			setError("Invalid credentials. Please try again.");
 		}

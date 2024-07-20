@@ -32,11 +32,10 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Scenario from "./scenario/Scenario";
 import Interview from "./interview/Interview";
-import Report from "@/Report/Report";
 import { ProgressBar } from "@/components/ProgressBar";
 import { getUserId } from "@/helpers/api";
 import { Charts } from "./Charts";
-import InterviewSession from "@/session/InterviewSession";
+import InterviewSession from "./session/InterviewSession";
 
 function Dashboard() {
 	const [selectedComponent, setSelectedComponent] = useState("Dashboard");
@@ -83,11 +82,7 @@ function Dashboard() {
 					</div>
 				);
 			case "Asset":
-				return (
-					<div>
-						<Report></Report>
-					</div>
-				);
+				return <div></div>;
 			default:
 				return <div>Dashboard Content</div>;
 		}
@@ -111,41 +106,62 @@ function Dashboard() {
 						<nav className="grid items-start px-2 text-sm font-medium lg:px-4">
 							<button
 								onClick={() => setSelectedComponent("Dashboard")}
-								className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+								className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+									selectedComponent === "Dashboard"
+										? "bg-primary text-muted"
+										: "bg-muted text-primary hover:text-primary"
+								}`}
 							>
 								<Home className="h-4 w-4" />
 								Dashboard
 							</button>
 							<button
 								onClick={() => setSelectedComponent("Scenario")}
-								className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+								className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+									selectedComponent === "Scenario"
+										? "bg-primary text-muted"
+										: "bg-muted text-primary hover:text-primary"
+								}`}
 							>
 								<ShoppingCart className="h-4 w-4" />
 								Scenario
 							</button>
 							<button
 								onClick={() => setSelectedComponent("Interview")}
-								className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+								className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+									selectedComponent === "Interview"
+										? "bg-primary text-muted"
+										: "bg-muted text-primary hover:text-primary"
+								}`}
 							>
 								<Package className="h-4 w-4" />
 								Interview
 							</button>
 							<button
 								onClick={() => setSelectedComponent("Session")}
-								className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+								className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+									selectedComponent === "Session"
+										? "bg-primary text-muted"
+										: "bg-muted text-primary hover:text-primary"
+								}`}
 							>
 								<Users className="h-4 w-4" />
 								Session
 							</button>
 							<button
 								onClick={() => setSelectedComponent("Report")}
-								className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+								className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+									selectedComponent === "Report"
+										? "bg-primary text-muted"
+										: "bg-muted text-primary hover:text-primary"
+								}`}
 							>
 								<LineChart className="h-4 w-4" />
 								Report
 							</button>
 						</nav>
 					</div>
+
 					<div className="mt-auto p-4">
 						<Card x-chunk="dashboard-02-chunk-0">
 							<CardHeader className="p-2 pt-0 md:p-4">
