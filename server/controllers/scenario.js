@@ -58,6 +58,43 @@ const listScenarios = async (req, res, next) => {
 	}
 };
 
+
+const listSessions = async (req, res, next) => {
+    const { userId } = req.query;
+
+    try {
+       
+        const uid = new mongoose.Types.ObjectId(userId);
+		// Aggregate pipeline to count sessions by userId
+        const sessionCount = await JobScenario.aggregate([
+            {
+                $match: {
+                    userId: uid,
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalSessions: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Check if sessionCount is not empty
+        if (sessionCount.length === 0) {
+            return res.status(404).json({ message: "No sessions found for this user." });
+        }
+
+        // Return the total number of sessions
+        res.status(200).json({ totalSessions: sessionCount[0].totalSessions });
+
+    } catch (error) {
+        console.error(error);
+        next(error);
+        res.status(500).json({ message: "An error occurred while retrieving sessions." });
+    }
+};
+
 /**
  * @desc Fetches a specific JobScenario object by userId and jobScenarioId
  * @param {object} req - Express request object containing userId and jobScenarioId in params
@@ -133,4 +170,5 @@ module.exports = {
 	getScenario,
 	updateScenario,
 	deleteScenario,
+	listSessions
 };
