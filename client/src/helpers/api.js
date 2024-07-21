@@ -148,15 +148,3 @@ export const callIssueInteractionProcessing = async (
 		console.log(err);
 	}
 };
-
-export const checkUsernameAvailability = async (username) => {
-	try {
-		const response = await axios.get(
-			`${import.meta.env.VITE_BACKEND_URI}/auth/user/${username}`
-		);
-		return response.data.status; // Ensure this returns a boolean
-	} catch (error) {
-		console.error("API Error:", error);
-		throw error;
-	}
-};

@@ -25,7 +25,6 @@ import {
 	listScenarios,
 	createScenario,
 	updateScenario,
-	deleteScenario,
 } from "@/helpers/scenarioAPI";
 
 function Scenario({ userId }) {
@@ -80,7 +79,7 @@ function Scenario({ userId }) {
 	// 	}
 	// };
 
-	const handleEdit = useCallback((scenario) => {
+	const handleEdit = useCallback(() => {
 		// setEditingScenario(scenario);
 		// setTitle(scenario.jobTitle);
 		// setCompany(scenario.company);
