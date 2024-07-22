@@ -81,7 +81,62 @@ const listInterviewSession = async (req, res, next) => {
 
 
 
-module.exports = {
-	createNewSession,
-	listInterviewSession,
+// Function to fetch a specific interview session by its ID
+const fetchInterview = async (req, res) => {
+    const { interviewID } = req.params;
+    try {
+        const interviewSession = await InterviewSession.findById(interviewID);
+        if (!interviewSession) {
+            return res.status(404).json({ message: "Interview session not found." });
+        }
+        res.status(200).json(interviewSession);
+    } catch (error) {
+        console.error("Error fetching InterviewSession:", error);
+        res.status(500).json({ message: "Failed to fetch interview session." });
+    }
 };
+
+
+
+// Function to list all interview sessions by user ID
+const listInterviewsByUser = async (req, res) => {
+    const { userID } = req.params;
+    try {
+        const user = await User.findById(userID).populate("interviewSessions");
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        res.status(200).json(user.interviewSessions);
+    } catch (error) {
+        console.error("Error listing interviews by user:", error);
+        res.status(500).json({ message: "Failed to list interviews by user." });
+    }
+};
+
+// Function to count the number of interview sessions by a specific user ID
+const countInterviewsByUserID = async (req, res) => {
+    const { userID } = req.params;
+    try {
+        const user = await User.findById(userID).select("interviewSessions");
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        const count = user.interviewSessions.length;
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error("Error counting interviews by user ID:", error);
+        res.status(500).json({ message: "Failed to count interviews by user ID." });
+    }
+};
+
+module.exports = {
+    createNewSession,
+    listInterviewSession,
+    fetchInterview,
+    listInterviewsByUser,
+    countInterviewsByUserID,
+};
+
+
+
+
